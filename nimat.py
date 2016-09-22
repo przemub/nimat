@@ -40,6 +40,9 @@ class Game:
 
     def __init__(self, mistrz):
         self.heaps = [6, 6, 6]
+        for i in range(3):
+            self.heaps[i] = random.randint(4, 10)
+
         self.active = -1
         self.curtip = 0
         self.end = False
@@ -53,6 +56,8 @@ class Game:
     def loop(self):
         while True:
             for event in pygame.event.get():
+                if event.type == KEYDOWN:
+                    return
                 if event.type == MOUSEBUTTONDOWN:
                     if not event.button == 1:
                         continue
@@ -74,11 +79,12 @@ class Game:
                         self.active = -1
                         self.curtip = 2
 
-                    if (y < 200 or y > 200 + 75*3 + 20 or x < 60):
+                    if (y < 150 or y > 446 or x < 60):# or x > 920):
                         continue
 
-                    curheap = x // (120*3 + 2*10)
-                    if curheap > 3:
+                    print(x, x-60, (x-60)//320)
+                    curheap = (x-150) // (390)
+                    if curheap > 2:
                         continue
 
                     if self.active == -1 and self.heaps[curheap] > 0:
@@ -179,20 +185,21 @@ class Game:
 
     @staticmethod
     def heap(size, number):
-        xs = 120
-        ys = 75
+        xs = 90
+        ys = 56
 
-        x1 = 30*size + 380*(size-1) + 60
-        y1 = 200
+        x1 = 50*size + 380*(size-1) + 10
+        y1 = 170
 
-        x2 = x1 + xs*3 + 2*10
-        y2 = y1 + ys*3 + 2*10
+        mx = 10
+        my = 10
+
+        x2 = x1 + xs*4 + 3*mx
+        y2 = y1 + ys*4 + 3*my
 
         xc = (x1 + x2)/2
         yc = (y1 + y2)/2
 
-        mx = 10
-        my = 10
 
         def one(y):
             screen.blit(stone, (xc - xs/2, y))
@@ -206,22 +213,42 @@ class Game:
             screen.blit(stone, (xc - xs/2 - (xs + 10), y))
             screen.blit(stone, (xc + xs/2 + 10, y))
 
+        def four(y):
+            screen.blit(stone, (x1, y))
+            screen.blit(stone, (x1 + xs + mx, y))
+            screen.blit(stone, (x1 + 2*(xs + mx), y))
+            screen.blit(stone, (x1 + 3*(xs + mx), y))
+
         if (number == 1):
-            one(yc + ys/2 + my)
+            one(y2 - ys)
         elif (number == 2):
-            two(yc + ys/2 + my)
+            two(y2 - ys)
         elif (number == 3):
-            three(yc + ys/2 + my)
+            three(y2 - ys)
         elif (number == 4):
-            one(yc - ys/2)
-            three(yc + (ys/2 + my))
+            four(y2 - ys)
         elif (number == 5):
-            two(yc - ys/2)
-            three(yc + (ys/2 + my))
+            one(y2 - 2*(ys) - my)
+            four(y2 - ys)
         elif (number == 6):
-            one(yc - ys/2 - (ys + my))
-            two(yc - ys/2)
-            three(yc + ys/2 + my)
+            two(y2 - 2*(ys) - my)
+            four(y2 - ys)
+        elif (number == 7):
+            three(y2 - 2*(ys) - my)
+            four(y2 - ys)
+        elif (number == 8):
+            one(y2 - 3*(ys) - 2*(my))
+            three(y2 - 2*(ys) - my)
+            four(y2 - ys)
+        elif (number == 9):
+            two(y2 - 3*(ys) - 2*(my))
+            three(y2 - 2*(ys) - my)
+            four(y2 - ys)
+        elif (number == 10):
+            one(y1)
+            two(y1 + ys + my)
+            three(y1 + 2*(ys + my))
+            four(y1 + 3*(ys + my))
 
 
 def main():
@@ -233,12 +260,14 @@ def main():
 
         # Wejście
         for event in pygame.event.get():
+            if event.type == KEYDOWN:
+                return
             if event.type == MOUSEBUTTONDOWN:
                 if not event.button == 1:
                     continue
 
                 x, y = event.pos
-                
+
                 if (x < 470 or x > 810):
                     continue
 
@@ -274,12 +303,12 @@ def main():
         btn2 = font.render("Zagraj z RNG", 1, (0,0,0))
         screen.blit(btn2, (1366/2 - btn2.get_rect().width/2, 768/2 - btn2.get_rect().height/2 + 80 + 50))
 
-        font = pygame.font.SysFont("monospace", 18)
+        font = pygame.font.SysFont("monospace", 24)
         left = font.render(u"Copyright (c) 2016 Przemysław Buczkowski. All rights reversed.",
                             1, (255,255,0))
         gith = font.render("https://github.com/przemub/nimat", 1, (255,255,0))
-        screen.blit(left, (1366-700, 768-60))
-        screen.blit(gith, (1366-370, 768-40))
+        screen.blit(left, (1366-left.get_rect().width-30, 768-60))
+        screen.blit(gith, (1366-gith.get_rect().width-30, 768-40))
 
         pygame.display.flip()
 
